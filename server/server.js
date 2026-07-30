@@ -15,7 +15,7 @@ const MAX_PAGES_TO_PARSE = 3; // 애매한거 중에서 상위 몇개 페이지�
 const MAX_PAGE_BYTES = 1_000_000;
 const MAX_REDIRECTS = 4;
 const PAGE_TIMEOUT_MS = 5_000;
-const UPSTAGE_TIMEOUT_MS = 15_000;
+const UPSTAGE_TIMEOUT_MS = 30_000;
 
 let apiKey = process.env.UPSTAGE_API_KEY || "";
 
@@ -113,38 +113,45 @@ function createPageVerificationPrompt(query, candidates) {
 2차 검증 대상: ${JSON.stringify(candidates)}`;
 }
 
-async function callSolar(prompt) {
-  let response;
+async function callSolar(prompt, requestLabel) {
+  const startedAt = performance.now();
 
   try {
-    response = await fetch("https://api.upstage.ai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        messages: [{ role: "user", content: prompt }],
-        temperature: 0, // 무작위성 낮추기
-        stream: false,
-      }),
-      signal: AbortSignal.timeout(UPSTAGE_TIMEOUT_MS),
-    });
-  } catch (error) {
-    if (error.name === "TimeoutError" || error.name === "AbortError") {
-      throw new Error("Upstage API 응답 시간이 15초를 초과했습니다.");
+    let response;
+
+    try {
+      response = await fetch("https://api.upstage.ai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: MODEL,
+          messages: [{ role: "user", content: prompt }],
+          temperature: 0, // 무작위성 낮추기
+          stream: false,
+        }),
+        signal: AbortSignal.timeout(UPSTAGE_TIMEOUT_MS),
+      });
+    } catch (error) {
+      if (error.name === "TimeoutError" || error.name === "AbortError") {
+        throw new Error("Upstage API 응답 시간이 30초를 초과했습니다.");
+      }
+      throw error;
     }
-    throw error;
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data?.error?.message || `Upstage API 오류 (${response.status})`);
+    }
+
+    return parseModelJson(data.choices?.[0]?.message?.content || "");
+  } finally {
+    const elapsedSeconds = ((performance.now() - startedAt) / 1_000).toFixed(2);
+    console.log(`[Upstage API] ${requestLabel}: ${elapsedSeconds}초`);
   }
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data?.error?.message || `Upstage API 오류 (${response.status})`);
-  }
-
-  return parseModelJson(data.choices?.[0]?.message?.content || "");
 }
 
 // 잘 모르겟지만 대충 밥어코드
@@ -398,7 +405,7 @@ function validateVerdicts(parsed, results) {
 }
 
 async function classify(query, results) {
-  const firstParsed = await callSolar(createPrompt(query, results));
+  const firstParsed = await callSolar(createPrompt(query, results), "1차 분류");
   const firstVerdicts = validateVerdicts(firstParsed, results);
   const resultsById = new Map(results.map((result) => [result.id, result]));
 
@@ -429,6 +436,7 @@ async function classify(query, results) {
   if (pageCandidates.length > 0) {
     const secondParsed = await callSolar(
       createPageVerificationPrompt(query, pageCandidates),
+      "2차 검증",
     );
     const candidateResults = pageCandidates.map(({ id }) => resultsById.get(id));
     const secondVerdicts = validateVerdicts(secondParsed, candidateResults);

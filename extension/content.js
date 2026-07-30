@@ -5,8 +5,12 @@ const MAX_RESULTS = 12;
 
 let classificationTimer;
 let isEnabled = false;
+let searchGeneration = 0;
+let lastQuery = new URL(location.href).searchParams.get("q") || "";
 
 function clearClassificationState() {
+  // 진행 중인 이전 검색의 응답이 도착해도 적용되지 않도록 무효화합니다.
+  searchGeneration += 1;
   clearTimeout(classificationTimer);
   document.querySelectorAll(".osb-badge").forEach((badge) => badge.remove());
   document.querySelectorAll(`[${BADGE_ATTRIBUTE}]`).forEach((heading) => {
@@ -142,13 +146,14 @@ async function classifyVisibleResults() {
     return;
   }
 
+  // 요청 당시의 검색어와 세대 번호를 응답 시점에 다시 확인합니다.
+  const requestGeneration = searchGeneration;
+  const query = new URL(location.href).searchParams.get("q") || "";
   const results = collectSearchResults();
 
   if (results.length === 0) {
     return;
   }
-
-  const query = new URL(location.href).searchParams.get("q") || "";
 
   results.forEach(({ heading }) => {
     heading.setAttribute(BADGE_ATTRIBUTE, "pending");
@@ -178,6 +183,12 @@ async function classifyVisibleResults() {
       return;
     }
 
+    const currentQuery = new URL(location.href).searchParams.get("q") || "";
+    // 연속 검색으로 화면이 바뀌었다면 늦게 도착한 이전 응답은 버립니다.
+    if (requestGeneration !== searchGeneration || query !== currentQuery) {
+      return;
+    }
+
     if (!Array.isArray(response.verdicts)) {
       throw new Error("분류 응답 형식이 올바르지 않습니다.");
     }
@@ -189,20 +200,34 @@ async function classifyVisibleResults() {
 
     results.forEach((result) => {
       const verdict = verdictsById.get(result.id);
-      if (verdict) {
+      const currentUrl = normalizeUrl(result.anchor.href)?.url;
+
+      // Google이 검색 결과 DOM을 재사용한 경우 잘못된 링크에 붙이지 않습니다.
+      if (verdict && result.heading.isConnected && currentUrl === result.url) {
         addBadge(result, verdict);
       }
     });
   } catch (error) {
     console.warn("[공식 사이트 딱지]", error.message || "분류 실패");
   } finally {
-    results.forEach(({ heading }) => {
-      heading.removeAttribute(BADGE_ATTRIBUTE);
-    });
+    // 오래된 요청이 새 검색 결과의 처리 상태를 지우지 않게 합니다.
+    const currentQuery = new URL(location.href).searchParams.get("q") || "";
+    if (requestGeneration === searchGeneration && query === currentQuery) {
+      results.forEach(({ heading }) => {
+        heading.removeAttribute(BADGE_ATTRIBUTE);
+      });
+    }
   }
 }
 
 function scheduleClassification() {
+  const currentQuery = new URL(location.href).searchParams.get("q") || "";
+
+  if (currentQuery !== lastQuery) {
+    clearClassificationState();
+    lastQuery = currentQuery;
+  }
+
   clearTimeout(classificationTimer);
   if (!isEnabled) {
     return;
