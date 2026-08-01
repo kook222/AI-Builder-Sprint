@@ -37,22 +37,49 @@ function normalizeUrl(rawUrl) {
   }
 }
 
-// 검색 결과의 YouTube 채널은 허용하고 개별 영상만 제외합니다.
-function isYouTubeVideoUrl(rawUrl) {
+// 공식 SNS 프로필/채널은 허용하고 개별 게시물, 영상, 릴스 등은 제외합니다.
+function isSocialMediaContentUrl(rawUrl) {
   try {
     const url = new URL(rawUrl);
-    const hostname = url.hostname.replace(/^www\./, "");
+    const hostname = url.hostname.replace(/^(?:www\.|m\.)/, "").toLowerCase();
+    const pathname = url.pathname.replace(/\/{2,}/g, "/");
 
     if (hostname === "youtu.be") {
-      return url.pathname.length > 1;
+      return pathname.length > 1;
     }
 
-    const isYouTube =
-      hostname === "youtube.com" || hostname.endsWith(".youtube.com");
-    const isVideoPath =
-      url.pathname === "/watch" || /^\/(?:shorts|live)\//i.test(url.pathname);
+    if (hostname === "youtube.com" || hostname.endsWith(".youtube.com")) {
+      return pathname === "/watch" || /^\/(?:shorts|live)\//i.test(pathname);
+    }
 
-    return isYouTube && isVideoPath;
+    if (hostname === "instagram.com") {
+      return /^\/(?:p|reel|reels|stories|tv)\//i.test(pathname);
+    }
+
+    if (hostname === "x.com" || hostname === "twitter.com") {
+      return /^\/[^/]+\/status\/\d+/i.test(pathname);
+    }
+
+    if (hostname === "tiktok.com") {
+      return /^\/(?:@[^/]+\/video|t)\//i.test(pathname);
+    }
+
+    if (hostname === "facebook.com" || hostname === "fb.watch") {
+      return (
+        hostname === "fb.watch" ||
+        /^\/(?:watch|reel|reels|stories|photo|photos|videos|posts|share)\b/i.test(
+          pathname,
+        ) ||
+        /^\/[^/]+\/(?:posts|videos)\//i.test(pathname) ||
+        url.searchParams.has("story_fbid")
+      );
+    }
+
+    if (hostname === "linkedin.com") {
+      return /^\/(?:feed\/update|posts)\//i.test(pathname);
+    }
+
+    return false;
   } catch {
     return false;
   }
@@ -65,7 +92,7 @@ function collectSearchResults() {
   for (const heading of document.querySelectorAll("h3")) {
     const anchor = heading.closest("a") || heading.parentElement?.closest("a");
 
-    if (anchor && isYouTubeVideoUrl(anchor.href)) {
+    if (anchor && isSocialMediaContentUrl(anchor.href)) {
       anchor.dataset.officialBadgeBound = "1";
       continue;
     }

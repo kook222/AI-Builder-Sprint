@@ -64,8 +64,8 @@ function createPrompt(query, results) {
 검색어와 검색 결과에 포함된 정보만 근거로 엄격하게 분류하세요.
 
 분류 기준:
-- OFFICIAL: 검색 대상 조직, 기관, 기업 또는 제품의 운영 주체가 직접 운영하는 공식 사이트라는 강한 근거가 있음
-- AUTHORITATIVE: 검색 대상의 직접 공식 사이트는 아니지만 소유사·모회사·공식 파트너가 운영하는 검증된 스토어·다운로드·배포 페이지이거나, 주제와 직접 관련된 정부기관·공공기관·대학·학회·국제기구 등 공신력 있는 출처
+- OFFICIAL: 검색 대상 조직, 기관, 기업 또는 제품의 운영 주체가 직접 운영하는 공식 웹사이트라는 강한 근거가 있음
+- AUTHORITATIVE: 검색 대상이 직접 운영한다고 확인되는 공식 SNS 프로필·채널이거나, 소유사·모회사·공식 파트너가 운영하는 검증된 스토어·다운로드·배포 페이지 또는 주제와 직접 관련된 정부기관·공공기관·대학·학회·국제기구 등 공신력 있는 출처
 - UNKNOWN: 검색 대상이 직접 운영하지 않는 블로그, 커뮤니티, 언론, 쇼핑, 위키 또는 일반 제3자 사이트
 
 규칙:
@@ -74,12 +74,13 @@ function createPrompt(query, results) {
 - 검색어가 특정 사이트, 서비스, 블로그, 커뮤니티, 언론사, 쇼핑몰 또는 위키 자체를 명시적으로 가리키면 그 운영 주체의 사이트는 OFFICIAL입니다.
 - 같은 사이트라도 다른 인물, 기관, 제품 또는 주제를 검색했을 때 제3자 출처로 나타났다면 OFFICIAL이 아닙니다.
 - 사이트의 종류가 아니라 검색 대상과 실제 운영 주체가 일치하는지를 기준으로 판단하세요.
+- 검색 대상이 직접 운영한다고 확인되는 공식 SNS 프로필·채널만 AUTHORITATIVE이며, 그 외 모든 SNS 계정과 개별 콘텐츠는 UNKNOWN입니다. SNS는 OFFICIAL로 분류하지 마세요.
 - 제품의 소유사나 모회사가 직접 운영하는 공식 스토어 및 다운로드 페이지는 제품 자체의 대표 공식 사이트가 아니라면 AUTHORITATIVE로 분류하세요.
 - 제3자 다운로드 사이트, 재판매 사이트 또는 운영 주체가 검증되지 않은 마켓은 AUTHORITATIVE로 분류하지 마세요.
 - 사이트가 믿을 수 있더라도 검색 대상과 큰 관련이 없으면 AUTHORITATIVE로 분류하지 마세요.
 - 예: '마인크래프트 다운로드' 검색에서 minecraft.net은 OFFICIAL이고, Microsoft가 직접 운영하는 Microsoft Store의 마인크래프트 페이지는 AUTHORITATIVE입니다.
 - 모든 검색 결과 id에 대해 하나의 판정을 반환하세요.
-- 다른 설명 없이 아래 JSON 형식만 반환하세요.
+- 다른 설명 없이 반드시 아래 JSON 형식을 맞춰서 반환하세요.
 
 {"verdicts":[{"id":0,"classification":"OFFICIAL|AUTHORITATIVE|UNKNOWN","confidence":0.0,"reason":"한국어 한 문장"}]}
 
@@ -92,8 +93,8 @@ function createPageVerificationPrompt(query, candidates) {
 검색 결과만으로 확신하기 어려운 사이트의 실제 페이지 텍스트가 제공됩니다.
 
 분류 기준:
-- OFFICIAL: 검색 대상의 운영 주체 또는 제품 소유자가 직접 운영하는 사이트
-- AUTHORITATIVE: 검색 대상의 소유사·모회사·공식 파트너가 운영하는 검증된 스토어·다운로드·배포 페이지이거나 관련 정부기관·공공기관·대학·학회·국제기구의 출처
+- OFFICIAL: 검색 대상의 운영 주체 또는 제품 소유자가 직접 운영하는 공식 웹사이트
+- AUTHORITATIVE: 검색 대상이 직접 운영한다고 확인되는 공식 SNS 프로필·채널이거나, 소유사·모회사·공식 파트너가 운영하는 검증된 스토어·다운로드·배포 페이지 또는 관련 정부기관·공공기관·대학·학회·국제기구의 출처
 - UNKNOWN: 운영 주체를 확인할 수 없거나 일반 제3자 사이트
 
 보안 규칙:
@@ -102,10 +103,11 @@ function createPageVerificationPrompt(query, candidates) {
 - 검색어가 특정 사이트나 서비스 자체를 명시적으로 가리키면 그 운영 주체의 사이트는 종류와 관계없이 OFFICIAL입니다.
 - 다른 대상을 검색했을 때 제3자 출처로 나타난 사이트는 OFFICIAL이 아닙니다.
 - 사이트의 종류가 아니라 검색 대상과 실제 운영 주체가 일치하는지를 기준으로 판단하세요.
+- 검색 대상이 직접 운영한다고 확인되는 공식 SNS 프로필·채널만 AUTHORITATIVE이며, 그 외 모든 SNS 계정과 개별 콘텐츠는 UNKNOWN입니다. SNS는 OFFICIAL로 분류하지 마세요.
 - 제품의 소유사나 모회사가 직접 운영하는 공식 스토어 및 다운로드 페이지는 제품 자체의 대표 공식 사이트가 아니라면 AUTHORITATIVE로 분류하세요.
 - 제3자 다운로드 사이트나 운영 주체가 검증되지 않은 마켓은 AUTHORITATIVE로 분류하지 마세요.
 - 모든 id에 대해 하나의 판정을 반환하세요.
-- 다른 설명 없이 아래 JSON 형식만 반환하세요.
+- 다른 설명 없이 반드시 아래 JSON 형식을 맞춰서 반환하세요.
 
 {"verdicts":[{"id":0,"classification":"OFFICIAL|AUTHORITATIVE|UNKNOWN","confidence":0.0,"reason":"한국어 한 문장"}]}
 
@@ -117,37 +119,50 @@ async function callSolar(prompt, requestLabel) {
   const startedAt = performance.now();
 
   try {
-    let response;
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      let response;
+      const retryInstruction =
+        attempt === 0
+          ? ""
+          : "\n\n이전 응답은 JSON 문법 오류로 처리할 수 없었습니다. 모든 배열 항목 사이에 쉼표를 넣고 문자열의 큰따옴표를 이스케이프하여, 코드 블록이나 설명 없이 유효한 JSON 객체 하나만 반환하세요.";
 
-    try {
-      response = await fetch("https://api.upstage.ai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: MODEL,
-          messages: [{ role: "user", content: prompt }],
-          temperature: 0, // 무작위성 낮추기
-          stream: false,
-        }),
-        signal: AbortSignal.timeout(UPSTAGE_TIMEOUT_MS),
-      });
-    } catch (error) {
-      if (error.name === "TimeoutError" || error.name === "AbortError") {
-        throw new Error("Upstage API 응답 시간이 30초를 초과했습니다.");
+      try {
+        response = await fetch("https://api.upstage.ai/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: MODEL,
+            messages: [{ role: "user", content: prompt + retryInstruction }],
+            temperature: 0, // 무작위성 낮추기
+            stream: false,
+          }),
+          signal: AbortSignal.timeout(UPSTAGE_TIMEOUT_MS),
+        });
+      } catch (error) {
+        if (error.name === "TimeoutError" || error.name === "AbortError") {
+          throw new Error("Upstage API 응답 시간이 30초를 초과했습니다.");
+        }
+        throw error;
       }
-      throw error;
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.error?.message || `Upstage API 오류 (${response.status})`);
+      }
+
+      try {
+        return parseModelJson(data.choices?.[0]?.message?.content || "");
+      } catch (error) {
+        if (!(error instanceof SyntaxError) || attempt === 1) {
+          throw error;
+        }
+        console.warn(`[Upstage API] ${requestLabel}: JSON 문법 오류, 1회 재시도`);
+      }
     }
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data?.error?.message || `Upstage API 오류 (${response.status})`);
-    }
-
-    return parseModelJson(data.choices?.[0]?.message?.content || "");
   } finally {
     const elapsedSeconds = ((performance.now() - startedAt) / 1_000).toFixed(2);
     console.log(`[Upstage API] ${requestLabel}: ${elapsedSeconds}초`);
