@@ -213,7 +213,8 @@
     }
 
     for (const { link, url } of items) {
-      clickContexts.set(link, { url, query });
+      // Google이 같은 링크 DOM을 재사용해도 클릭 시점의 최신 실행 ID를 사용합니다.
+      clickContexts.set(link, { url, query, runId });
       if (link.dataset.gurajegeoRiskClickBound !== '1') {
         link.dataset.gurajegeoRiskClickBound = '1';
         link.addEventListener('mousedown', () => {
@@ -222,7 +223,7 @@
           chrome.runtime.sendMessage({
             target: 'gj:risk',
             type: 'CLICKED',
-            runId,
+            runId: context.runId,
             url: context.url,
             query: context.query,
           }).catch(() => {});
