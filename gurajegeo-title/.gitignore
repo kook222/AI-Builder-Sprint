@@ -1,0 +1,6 @@
+# 로컬 Solar API 키가 들어가는 파일입니다.
+config.local.js
+
+# 운영체제와 편집기가 만드는 불필요한 파일입니다.
+.DS_Store
+*.log

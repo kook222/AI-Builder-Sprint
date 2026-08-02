@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>공식 사이트 판별기</title>
+    <style>
+      body {
+        width: 270px;
+        margin: 0;
+        padding: 16px;
+        color: #202124;
+        font: 14px/1.5 Arial, sans-serif;
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: 17px;
+      }
+
+      .setting {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #dadce0;
+      }
+
+      .switch {
+        position: relative;
+        width: 36px;
+        height: 20px;
+      }
+
+      .switch input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+      }
+
+      .track {
+        position: absolute;
+        inset: 0;
+        border-radius: 10px;
+        background: #9aa0a6;
+        cursor: pointer;
+      }
+
+      .track::after {
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #ffffff;
+        content: "";
+        transition: transform 120ms ease;
+      }
+
+      .switch input:checked + .track {
+        background: #1967d2;
+      }
+
+      .switch input:checked + .track::after {
+        transform: translateX(16px);
+      }
+
+      .switch input:focus-visible + .track {
+        outline: 2px solid #1967d2;
+        outline-offset: 2px;
+      }
+
+      .dot {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        margin-right: 6px;
+        border-radius: 50%;
+      }
+
+      .blue {
+        background: #1967d2;
+      }
+
+      .green {
+        background: #188038;
+      }
+
+    </style>
+  </head>
+  <body>
+    <h1>공식 사이트 딱지</h1>
+    <div class="setting">
+      <span>딱지 표시</span>
+      <label class="switch">
+        <input id="enabled" type="checkbox" aria-label="딱지 표시" />
+        <span class="track"></span>
+      </label>
+    </div>
+    <p><span class="dot blue"></span>검색 대상의 공식 홈페이지</p>
+    <p><span class="dot green"></span>공식 배포 채널·공공기관 등 준공식 출처</p>
+    <script src="popup.js"></script>
+  </body>
+</html>

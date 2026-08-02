@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        width: 260px;
+        margin: 0;
+        padding: 16px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        font-size: 13px;
+        color: #202124;
+      }
+
+      h1 {
+        margin: 0 0 2px;
+        font-size: 15px;
+      }
+
+      .sub {
+        margin: 0 0 16px;
+        font-size: 11px;
+        color: #80868b;
+      }
+
+      /* 온오프 스위치 */
+      .row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 12px;
+        border: 1px solid #e0e2e4;
+        border-radius: 8px;
+      }
+
+      .switch {
+        position: relative;
+        width: 40px;
+        height: 22px;
+        flex: none;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider {
+        position: absolute;
+        inset: 0;
+        background: #bdc1c6;
+        border-radius: 22px;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+
+      .slider::before {
+        content: '';
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        left: 2px;
+        top: 2px;
+        background: #fff;
+        border-radius: 50%;
+        transition: transform 0.15s;
+      }
+
+      input:checked + .slider {
+        background: #1a73e8;
+      }
+
+      input:checked + .slider::before {
+        transform: translateX(18px);
+      }
+
+      #state {
+        font-weight: 600;
+      }
+
+      /* 로그 */
+      .logs {
+        margin-top: 16px;
+        padding-top: 14px;
+        border-top: 1px solid #eceff1;
+      }
+
+      .logs-head {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 12px;
+        color: #5f6368;
+      }
+
+      .buttons {
+        display: flex;
+        gap: 6px;
+      }
+
+      button {
+        flex: 1;
+        padding: 7px 0;
+        border: 1px solid #dadce0;
+        border-radius: 6px;
+        background: #fff;
+        font-family: inherit;
+        font-size: 12px;
+        color: #202124;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: #f8f9fa;
+      }
+
+      button:disabled {
+        color: #bdc1c6;
+        cursor: default;
+      }
+
+      input[type='password'] {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 7px 9px;
+        border: 1px solid #dadce0;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 12px;
+      }
+
+      #msg {
+        margin-top: 8px;
+        min-height: 14px;
+        font-size: 11px;
+        color: #1e8e3e;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>FactTrace</h1>
+    <p class="sub">검색 결과의 광고 · 피싱 · 로그인 필요를 표시합니다</p>
+
+    <div class="row">
+      <span id="state">켜짐</span>
+      <label class="switch">
+        <input type="checkbox" id="toggle" />
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="logs">
+      <div class="logs-head"><span>API 키</span><span id="keystate"></span></div>
+      <input type="password" id="apikey" placeholder="up_..." autocomplete="off" />
+      <div style="height: 14px"></div>
+    </div>
+
+    <div class="logs">
+      <div class="logs-head">
+        <span>LLM 기록</span>
+        <span id="count">0건</span>
+      </div>
+      <div class="buttons">
+        <button id="save">log 폴더에 저장</button>
+        <button id="clear">비우기</button>
+      </div>
+      <div id="msg"></div>
+    </div>
+
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>
