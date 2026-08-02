@@ -1,0 +1,14 @@
+/* 세 기능이 Google 제목 옆 표시를 공유할 때 사용하는 충돌 방지용 마운트입니다. */
+.gj-result-hub[data-gurajegeo-ui="result-hub"] {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+.gj-result-hub[data-gurajegeo-ui="result-hub"] > [data-gurajegeo-ui="official"],
+.gj-result-hub[data-gurajegeo-ui="result-hub"] > [data-gurajegeo-ui="risk"] {
+  margin-left: 0;
+}

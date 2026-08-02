@@ -1,0 +1,56 @@
+{
+  "manifest_version": 3,
+  "name": "구라제거기",
+  "version": "1.0.0",
+  "description": "검색 결과의 제목·본문 일치, 위험성, 공식 출처를 한 번에 분석합니다.",
+  "minimum_chrome_version": "116",
+  "permissions": [
+    "scripting",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "구라제거기"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "features/title/content.js",
+        "features/risk/content/serp.js",
+        "features/risk/content/page.js"
+      ],
+      "css": [
+        "shared/content.css",
+        "features/title/styles.css",
+        "features/risk/content/style.css"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://www.google.com/search*",
+        "https://www.google.co.kr/search*"
+      ],
+      "js": [
+        "features/official/content.js"
+      ],
+      "css": [
+        "features/official/badge.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

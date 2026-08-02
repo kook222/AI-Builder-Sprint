@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>구라제거기</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main id="gj-popup-root" class="gjp-shell">
+      <header class="gjp-header">
+        <div class="gjp-logo" aria-hidden="true">G</div>
+        <div>
+          <h1 class="gjp-title">구라제거기</h1>
+          <p class="gjp-subtitle">검색 결과를 세 관점에서 동시에 검토합니다.</p>
+        </div>
+        <span id="gjp-overall-state" class="gjp-overall-state">대기</span>
+      </header>
+
+      <section class="gjp-panel gjp-api-panel" aria-labelledby="gjp-api-title">
+        <div class="gjp-section-heading">
+          <div>
+            <h2 id="gjp-api-title">Upstage API</h2>
+            <p>세 기능이 같은 Solar Pro 3 키를 공유합니다.</p>
+          </div>
+          <span id="gjp-key-state" class="gjp-key-state">미설정</span>
+        </div>
+        <div class="gjp-key-row">
+          <label class="gjp-visually-hidden" for="gjp-api-key">Upstage API 키</label>
+          <input id="gjp-api-key" class="gjp-key-input" type="password" placeholder="up_..." autocomplete="off" />
+          <button id="gjp-key-visibility" class="gjp-icon-button" type="button" aria-label="API 키 표시">보기</button>
+          <button id="gjp-save-key" class="gjp-secondary-button" type="button">저장</button>
+        </div>
+        <p class="gjp-security-note">키는 이 확장의 로컬 저장소에만 보관되고 웹페이지에는 전달되지 않습니다.</p>
+      </section>
+
+      <section class="gjp-features" aria-labelledby="gjp-features-title">
+        <div class="gjp-section-heading gjp-features-heading">
+          <div>
+            <h2 id="gjp-features-title">기능 및 진행 상황</h2>
+            <p>각 기능은 서로 영향을 주지 않고 독립적으로 작동합니다.</p>
+          </div>
+          <button id="gjp-clear-progress" class="gjp-text-button" type="button">상태 초기화</button>
+        </div>
+
+        <article class="gjp-feature-card" data-feature-card="title">
+          <div class="gjp-feature-head">
+            <span class="gjp-feature-icon gjp-feature-icon-title" aria-hidden="true">T</span>
+            <div class="gjp-feature-copy">
+              <h3>제목·본문 비교</h3>
+              <p>실제 본문을 읽고 제목의 과장·불일치를 확인합니다.</p>
+            </div>
+            <label class="gjp-switch">
+              <input type="checkbox" data-feature-toggle="title" />
+              <span class="gjp-switch-track" aria-hidden="true"></span>
+              <span class="gjp-visually-hidden">제목·본문 비교 켜기</span>
+            </label>
+          </div>
+          <div class="gjp-progress-row">
+            <span class="gjp-phase" data-progress-phase="title">대기</span>
+            <span class="gjp-count" data-progress-count="title">0 / 0</span>
+          </div>
+          <div class="gjp-progress-track"><span data-progress-bar="title"></span></div>
+          <p class="gjp-progress-detail" data-progress-detail="title">분석을 시작하지 않았습니다.</p>
+        </article>
+
+        <article class="gjp-feature-card" data-feature-card="risk">
+          <div class="gjp-feature-head">
+            <span class="gjp-feature-icon gjp-feature-icon-risk" aria-hidden="true">!</span>
+            <div class="gjp-feature-copy">
+              <h3>피싱·광고 위험</h3>
+              <p>광고성, 피싱, 로그인 장벽과 의심 문구를 확인합니다.</p>
+            </div>
+            <label class="gjp-switch">
+              <input type="checkbox" data-feature-toggle="risk" />
+              <span class="gjp-switch-track" aria-hidden="true"></span>
+              <span class="gjp-visually-hidden">피싱·광고 위험 검사 켜기</span>
+            </label>
+          </div>
+          <div class="gjp-progress-row">
+            <span class="gjp-phase" data-progress-phase="risk">대기</span>
+            <span class="gjp-count" data-progress-count="risk">0 / 0</span>
+          </div>
+          <div class="gjp-progress-track"><span data-progress-bar="risk"></span></div>
+          <p class="gjp-progress-detail" data-progress-detail="risk">분석을 시작하지 않았습니다.</p>
+        </article>
+
+        <article class="gjp-feature-card" data-feature-card="official">
+          <div class="gjp-feature-head">
+            <span class="gjp-feature-icon gjp-feature-icon-official" aria-hidden="true">✓</span>
+            <div class="gjp-feature-copy">
+              <h3>공식·공신력 출처</h3>
+              <p>검색 대상이 직접 운영하거나 신뢰할 만한 출처인지 판별합니다.</p>
+            </div>
+            <label class="gjp-switch">
+              <input type="checkbox" data-feature-toggle="official" />
+              <span class="gjp-switch-track" aria-hidden="true"></span>
+              <span class="gjp-visually-hidden">공식·공신력 출처 표시 켜기</span>
+            </label>
+          </div>
+          <div class="gjp-progress-row">
+            <span class="gjp-phase" data-progress-phase="official">대기</span>
+            <span class="gjp-count" data-progress-count="official">0 / 0</span>
+          </div>
+          <div class="gjp-progress-track"><span data-progress-bar="official"></span></div>
+          <p class="gjp-progress-detail" data-progress-detail="official">분석을 시작하지 않았습니다.</p>
+        </article>
+      </section>
+
+      <section class="gjp-actions">
+        <button id="gjp-run" class="gjp-primary-button" type="button">현재 검색 페이지 분석</button>
+        <p id="gjp-message" class="gjp-message" role="status" aria-live="polite"></p>
+      </section>
+
+    </main>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

@@ -1,0 +1,67 @@
+.osb-badge[data-gurajegeo-ui="official"] {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  cursor: help;
+  vertical-align: 2px;
+}
+
+.osb-badge[data-gurajegeo-ui="official"] .osb-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+.osb-badge[data-gurajegeo-ui="official"] .osb-tooltip {
+  all: initial;
+  position: absolute;
+  z-index: 2147483647;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  display: none;
+  box-sizing: border-box;
+  width: max-content;
+  max-width: min(320px, calc(100vw - 24px));
+  padding: 8px 10px;
+  border: 1px solid #dadce0;
+  border-radius: 6px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(60, 64, 67, 0.24);
+  color: #202124;
+  direction: ltr;
+  font-family: Arial, "Segoe UI", sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+  text-align: left;
+  transform: translateX(-50%);
+  unicode-bidi: isolate;
+  white-space: normal;
+  writing-mode: horizontal-tb;
+}
+
+.osb-badge[data-gurajegeo-ui="official"] .osb-tooltip strong,
+.osb-badge[data-gurajegeo-ui="official"] .osb-tooltip span {
+  display: block;
+}
+
+.osb-badge[data-gurajegeo-ui="official"] .osb-tooltip strong {
+  margin-bottom: 2px;
+  font-weight: 600;
+}
+
+.osb-badge[data-gurajegeo-ui="official"]:hover .osb-tooltip,
+.osb-badge[data-gurajegeo-ui="official"]:focus-visible .osb-tooltip {
+  display: block;
+}
+
+.osb-badge.osb-official[data-gurajegeo-ui="official"] .osb-dot {
+  background: #1967d2;
+}
+
+.osb-badge.osb-authoritative[data-gurajegeo-ui="official"] .osb-dot {
+  background: #188038;
+}

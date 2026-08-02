@@ -1,0 +1,8 @@
+.DS_Store
+**/.DS_Store
+
+# 개인 API 키와 로컬 실행 설정은 저장소에 올리지 않습니다.
+*.local.js
+.env
+.env.*
+!.env.example

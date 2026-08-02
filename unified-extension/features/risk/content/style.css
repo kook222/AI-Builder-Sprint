@@ -1,0 +1,208 @@
+/* 검색 결과 제목 옆 표시 */
+
+.ft-mark[data-gurajegeo-ui="risk"] {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 7px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 17px;
+  vertical-align: middle;
+  white-space: nowrap;
+  cursor: help;
+}
+
+.ft-mark.ft-phishing[data-gurajegeo-ui="risk"] {
+  background: #fce8e6;
+  color: #b3261e;
+  border: 1px solid #f0b4ae;
+}
+
+.ft-mark.ft-ad[data-gurajegeo-ui="risk"] {
+  background: #fef3d7;
+  color: #8a5a00;
+  border: 1px solid #f0d089;
+}
+
+.ft-mark.ft-login[data-gurajegeo-ui="risk"] {
+  background: #e8eefc;
+  color: #1a4fa0;
+  border: 1px solid #b9cbf0;
+}
+
+.ft-mark.ft-pending[data-gurajegeo-ui="risk"] {
+  background: #f1f3f4;
+  color: #80868b;
+  border: 1px solid #e0e2e4;
+  font-weight: 400;
+}
+
+/* 마우스오버 설명 상자 */
+
+.ft-tip[data-gurajegeo-ui="risk"] {
+  position: absolute;
+  z-index: 2147483646;
+  display: none;
+  box-sizing: border-box;
+  max-width: 320px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: #202124;
+  color: #e8eaed;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 12px;
+  line-height: 1.55;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+
+.ft-tip[data-gurajegeo-ui="risk"] .ft-tip-head {
+  margin-bottom: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.ft-tip[data-gurajegeo-ui="risk"] .ft-tip-phishing {
+  color: #ff9d97;
+}
+
+.ft-tip[data-gurajegeo-ui="risk"] .ft-tip-ad {
+  color: #ffcf70;
+}
+
+.ft-tip[data-gurajegeo-ui="risk"] .ft-tip-login {
+  color: #9ec1ff;
+}
+
+.ft-tip[data-gurajegeo-ui="risk"] .ft-tip-body {
+  word-break: keep-all;
+}
+
+.ft-tip[data-gurajegeo-ui="risk"] .ft-tip-label {
+  margin: 8px 0 3px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #9aa0a6;
+}
+
+.ft-tip[data-gurajegeo-ui="risk"] .ft-tip-parts {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #dadce0;
+  word-break: keep-all;
+}
+
+.ft-tip[data-gurajegeo-ui="risk"] .ft-tip-parts li {
+  margin: 3px 0;
+}
+
+/* 방문 페이지 하이라이트 */
+mark.ft-hl[data-gurajegeo-ui="risk-highlight"] {
+  padding: 0;
+  cursor: inherit;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+mark.ft-hl-phishing[data-gurajegeo-ui="risk-highlight"] {
+  background: #ff4b4b;
+  color: #fff;
+}
+
+mark.ft-hl-ad[data-gurajegeo-ui="risk-highlight"] {
+  background: #ffd0d0;
+  color: #7a1010;
+}
+
+/* 링크 · 버튼 하이라이트 */
+[data-gurajegeo-risk-highlight="phishing"].ft-hl-on-phishing {
+  background: #ff4b4b !important;
+  color: #fff !important;
+}
+
+[data-gurajegeo-risk-highlight="ad"].ft-hl-on-ad {
+  background: #ffd0d0 !important;
+  color: #7a1010 !important;
+}
+
+/* 상단 경고 띠 */
+
+.ft-banner[data-gurajegeo-ui="risk-banner"] {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  width: min(760px, calc(100vw - 24px));
+  max-width: calc(100vw - 24px);
+  transform: translateX(-50%);
+  z-index: 2147483647;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-sizing: border-box;
+  padding: 10px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 10px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.ft-banner.ft-banner-phishing[data-gurajegeo-ui="risk-banner"] {
+  background: #b3261e;
+}
+
+.ft-banner.ft-banner-ad[data-gurajegeo-ui="risk-banner"] {
+  background: #8a5a00;
+}
+
+.ft-banner[data-gurajegeo-ui="risk-banner"] .ft-banner-main {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+}
+
+.ft-banner[data-gurajegeo-ui="risk-banner"] .ft-banner-main strong {
+  flex: none;
+}
+
+.ft-banner[data-gurajegeo-ui="risk-banner"] .ft-banner-main span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.92;
+}
+
+.ft-banner[data-gurajegeo-ui="risk-banner"] .ft-banner-side {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: none;
+}
+
+.ft-banner[data-gurajegeo-ui="risk-banner"] .ft-banner-count {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.ft-banner[data-gurajegeo-ui="risk-banner"] .ft-banner-close {
+  padding: 3px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 4px;
+  background: transparent;
+  color: #fff;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.ft-banner[data-gurajegeo-ui="risk-banner"] .ft-banner-close:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
