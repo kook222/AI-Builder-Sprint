@@ -45,6 +45,7 @@
         "https://www.google.co.kr/search*"
       ],
       "js": [
+        "google-auto-run.js",
         "features/official/content.js"
       ],
       "css": [

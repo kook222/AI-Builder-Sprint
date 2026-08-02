@@ -23,7 +23,9 @@ function clearClassificationState() {
   rerunRequested = false;
   initialBatchPending = false;
   clearTimeout(classificationTimer);
-  document.querySelectorAll('[data-gurajegeo-ui="official"]').forEach((badge) => badge.remove());
+  document.querySelectorAll(
+    '[data-gurajegeo-ui="official"], [data-gurajegeo-ui="official-tooltip"]',
+  ).forEach((element) => element.remove());
   document.querySelectorAll(`[${BADGE_ATTRIBUTE}]`).forEach((heading) => {
     heading.removeAttribute(BADGE_ATTRIBUTE);
   });
@@ -190,9 +192,11 @@ function addBadge(result, verdict) {
   badge.className = `osb-badge osb-${verdict.classification.toLowerCase()}`;
   badge.dataset.gurajegeoUi = "official";
   badge.tabIndex = 0;
+  const tooltipId = `gurajegeo-official-tooltip-${result.id}-${createRunId()}`;
+  badge.setAttribute("aria-describedby", tooltipId);
   badge.setAttribute(
     "aria-label",
-    `${verdict.classification === "OFFICIAL" ? "공식 사이트" : "준공식 또는 공신력 있는 사이트"}, 확신도 ${Math.round(verdict.confidence * 100)}%, ${verdict.reason}`,
+    `${verdict.classification === "OFFICIAL" ? "공식 사이트" : "준공식 또는 공신력 있는 사이트"}, 확신도 ${Math.round(verdict.confidence * 100)}%`,
   );
 
   const dot = document.createElement("span");
@@ -200,6 +204,9 @@ function addBadge(result, verdict) {
 
   const tooltip = document.createElement("span");
   tooltip.className = "osb-tooltip";
+  tooltip.id = tooltipId;
+  tooltip.dataset.gurajegeoUi = "official-tooltip";
+  tooltip.setAttribute("popover", "manual");
 
   const confidence = document.createElement("strong");
   confidence.textContent = `확신도 ${Math.round(verdict.confidence * 100)}%`;
@@ -208,8 +215,60 @@ function addBadge(result, verdict) {
   reason.textContent = verdict.reason;
 
   tooltip.append(confidence, reason);
-  badge.append(dot, tooltip);
+  badge.append(dot);
   hub.append(badge);
+  // Google 검색 결과의 주소·메뉴보다 항상 앞에 보이도록 툴팁을 badge 밖의
+  // document.body에 두고 Popover top layer에서 표시합니다.
+  document.body.append(tooltip);
+
+  const showTooltip = () => showOfficialTooltip(badge, tooltip);
+  const hideTooltip = () => hideOfficialTooltip(tooltip);
+  badge.addEventListener("mouseenter", showTooltip);
+  badge.addEventListener("mouseleave", hideTooltip);
+  badge.addEventListener("focus", showTooltip);
+  badge.addEventListener("blur", hideTooltip);
+}
+
+/** 딱지 위치를 기준으로 툴팁을 배치하고 화면 경계를 벗어나면 뒤집거나 보정합니다. */
+function showOfficialTooltip(badge, tooltip) {
+  if (!badge.isConnected || !tooltip.isConnected) return;
+
+  try {
+    if (!tooltip.matches(":popover-open")) tooltip.showPopover();
+  } catch {
+    return;
+  }
+
+  tooltip.style.visibility = "hidden";
+  const badgeRect = badge.getBoundingClientRect();
+  const tooltipRect = tooltip.getBoundingClientRect();
+  const viewportPadding = 12;
+  const gap = 8;
+
+  let top = badgeRect.top - tooltipRect.height - gap;
+  if (top < viewportPadding) top = badgeRect.bottom + gap;
+  top = Math.max(
+    viewportPadding,
+    Math.min(top, window.innerHeight - tooltipRect.height - viewportPadding),
+  );
+
+  let left = badgeRect.left + (badgeRect.width - tooltipRect.width) / 2;
+  left = Math.max(
+    viewportPadding,
+    Math.min(left, window.innerWidth - tooltipRect.width - viewportPadding),
+  );
+
+  tooltip.style.top = `${Math.round(top)}px`;
+  tooltip.style.left = `${Math.round(left)}px`;
+  tooltip.style.visibility = "visible";
+}
+
+function hideOfficialTooltip(tooltip) {
+  try {
+    if (tooltip.matches(":popover-open")) tooltip.hidePopover();
+  } catch {
+    // 페이지 이동 중 이미 제거된 팝오버는 별도 정리가 필요하지 않습니다.
+  }
 }
 
 async function classifyVisibleResults() {
@@ -320,6 +379,7 @@ async function classifyVisibleResults() {
 
 function scheduleClassification() {
   clearTimeout(classificationTimer);
+  removeOrphanedOfficialTooltips();
   if (!isActiveSearchPage()) {
     if (isEnabled) deactivateSearchPage();
     return;
@@ -332,6 +392,17 @@ function scheduleClassification() {
   classificationTimer = setTimeout(() => {
     classifyVisibleResults().catch(console.error);
   }, 700);
+}
+
+/** Google이 결과 카드 DOM을 교체했을 때 body에 남은 툴팁도 함께 정리합니다. */
+function removeOrphanedOfficialTooltips() {
+  const referencedIds = new Set(
+    [...document.querySelectorAll('[data-gurajegeo-ui="official"][aria-describedby]')]
+      .map((badge) => badge.getAttribute("aria-describedby")),
+  );
+  document.querySelectorAll('[data-gurajegeo-ui="official-tooltip"]').forEach((tooltip) => {
+    if (!referencedIds.has(tooltip.id)) tooltip.remove();
+  });
 }
 
 new MutationObserver((mutations) => {
@@ -350,8 +421,8 @@ new MutationObserver((mutations) => {
   subtree: true,
 });
 
-// 설치·새로고침 시에는 설정 가능 여부만 읽습니다. 실제 분석은 팝업의 RUN 명령을
-// 받은 현재 q+start 검색 페이지에서만 활성화됩니다.
+// 설치·새로고침 시에는 설정 가능 여부만 읽습니다. 실제 분석은 Google 자동 실행
+// 조정자 또는 팝업의 수동 RUN 명령을 받은 현재 q+start 검색 페이지에서 활성화됩니다.
 const initialSettingsGeneration = settingsGeneration;
 readFeatureEnabled().then((enabled) => {
   if (settingsGeneration === initialSettingsGeneration) featureReady = enabled;
