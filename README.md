@@ -29,7 +29,6 @@
 gurajegeo-title/   제목·본문 비교 원본
 fact-trace/        피싱·광고 위험 원본
 extension/         공식 출처 원본 확장
-server/            공식 출처 원본 개발 서버
 unified-extension/ 실제 통합 실행본
 ```
 
