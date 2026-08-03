@@ -125,14 +125,6 @@ flowchart LR
     D2 --> G["기사 진입 시 경고·의심 문장 강조"]
 ```
 
-### 공통 실행 구조
-
-- Chrome Manifest V3의 Service Worker와 Content Script로 구성되어 별도 서버 없이 브라우저 안에서 동작합니다.
-- 자동 실행 조정기가 최초 로드, Google 내부 URL 변경, 검색 결과 DOM 변경을 감지합니다. 결과가 안정된 뒤 실행해 이전 페이지의 DOM을 잘못 분석하는 문제를 줄였습니다.
-- 제목, 위험, 출처 표시 기능은 서로 기다리지 않고 병렬로 실행합니다. 한 기능이나 한 결과가 실패해도 나머지 분석은 계속됩니다.
-- 동시에 지나치게 많은 요청을 보내지 않도록 공통 Solar 동시 요청 수를 제한하고, 긴 작업 중에는 Service Worker가 종료되지 않도록 실행 상태를 유지합니다.
-- 기능별 진행률은 `chrome.storage.session`, API 키와 토글 설정은 `chrome.storage.local`에 저장합니다.
-- Google의 SPA 페이지 이동, 뒤로가기, 앞 페이지 이동을 감지해 이전 실행과 UI를 정리하고 현재 검색 단위의 결과만 표시합니다.
 
 ### 통합본 파일 구조
 
@@ -180,6 +172,25 @@ unified-extension/
 3. 확신도가 애매한 결과는 실제 페이지 내용을 제한적으로 확인한 뒤 한 번 더 검증합니다.
 4. 최종 확신도 70% 이상인 `OFFICIAL`과 `AUTHORITATIVE`만 점으로 표시합니다.
 5. 호버 설명은 브라우저의 최상위 Popover 레이어를 사용해 Google 주소·메뉴 UI와 공간상 겹치더라도 설명이 뒤에 가려지지 않게 했습니다.
+
+## AI 활용 정보
+
+### 모델
+
+- Upstage `solar-pro3`
+
+### API 사용 위치
+
+- 제목·본문 비교: `unified-extension/features/title/background.js`
+- 피싱·광고 위험 분석: `unified-extension/features/risk/lib/solar.js`
+- 공식 출처 분류: `unified-extension/features/official/background.js`
+- 공통 API 동시 요청 관리: `unified-extension/shared/solar-gate.js`
+
+### 프롬프트 위치
+
+- 제목·본문 비교: `unified-extension/features/title/background.js`
+- 피싱·광고 위험 분석: `unified-extension/features/risk/lib/prompts.js`
+- 공식 출처 분류: `unified-extension/features/official/background.js`
 
 ## 예외 처리와 안전장치
 
@@ -232,15 +243,4 @@ unified-extension/
 - 일부 결과만 실패했다면 전체 확장을 다시 설치할 필요 없이 **현재 검색 페이지 분석**으로 재시도합니다.
 - Chrome 116 미만에서는 출처 표시의 판단 근거 Popover가 지원되지 않으므로 최신 Chrome을 사용합니다.
 
-## 보존된 원본 구현
 
-세 기능의 확장 구현은 원형을 확인할 수 있도록 각각 별도 보존했고, 통합본을 포함해 총 네 폴더로 구성했습니다.
-
-```text
-gurajegeo-title/   제목·본문 비교 원본
-fact-trace/        피싱·광고 위험 원본
-extension/         출처 표시 원본 확장
-unified-extension/ 실제 통합 실행본
-```
-
-기존 폴더는 각 기능의 원형과 개발 이력을 확인하기 위한 것이며, 실제 통합 사용과 심사에는 `unified-extension/`만 Chrome에 로드합니다. 통합본의 파일별 구조는 [unified-extension/README.md](unified-extension/README.md)를 참고하세요.
