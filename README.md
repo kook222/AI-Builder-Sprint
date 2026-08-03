@@ -172,23 +172,47 @@ unified-extension/
 4. 최종 확신도 70% 이상인 `OFFICIAL`과 `AUTHORITATIVE`만 점으로 표시합니다.
 5. 호버 설명은 브라우저의 최상위 Popover 레이어를 사용해 Google의 주소·메뉴 UI와 겹치더라도 설명이 뒤에 가려지지 않도록 했습니다.
 
-## AI 활용 정보
+## AI 활용 방식
 
-### 모델
+이 프로젝트는 **서비스 실행 중 의미 판단**에 Upstage Solar Pro 3를 사용하고, **개발·통합·검토 보조**에 AI 코딩 어시스턴트와 병렬 하위 에이전트를 활용했습니다. AI가 만든 결과를 그대로 채택하지 않고 사람이 기능 범위와 판정 기준을 정한 뒤 실제 Chrome 화면, 수집 원문, 코드 실행 결과로 반복 검증했습니다.
 
-- Upstage `solar-pro3`
+### 런타임 모델과 코드 위치
 
-### API 호출 위치
+| 기능 | API 호출 | 프롬프트·검증 |
+|---|---|---|
+| 제목·본문 비교 | [`features/title/background.js`](unified-extension/features/title/background.js) | 같은 파일에서 긴 본문 청크 분석, 최종 판정, 원문 근거 검증을 함께 관리 |
+| 피싱·광고 위험 | [`features/risk/lib/solar.js`](unified-extension/features/risk/lib/solar.js) | [`features/risk/lib/prompts.js`](unified-extension/features/risk/lib/prompts.js)와 `verify.js`에서 허용 라벨·근거를 검증 |
+| 출처 표시 | [`features/official/background.js`](unified-extension/features/official/background.js) | 같은 파일에서 `OFFICIAL`·`AUTHORITATIVE`·`UNKNOWN` 기준과 2차 검증을 관리 |
 
-- 제목·본문 비교: `unified-extension/features/title/background.js`
-- 피싱·광고 위험 분석: `unified-extension/features/risk/lib/solar.js`
-- 공식 출처 분류: `unified-extension/features/official/background.js`
+세 기능 모두 Upstage `solar-pro3`를 사용합니다.
 
-### 프롬프트 위치
+### 개발 단계별 활용
 
-- 제목·본문 비교: `unified-extension/features/title/background.js`
-- 피싱·광고 위험 분석: `unified-extension/features/risk/lib/prompts.js`
-- 공식 출처 분류: `unified-extension/features/official/background.js`
+| 단계 | AI를 활용한 작업 | 사람이 확인한 내용 |
+|---|---|---|
+| 구조 분석 | 세 기능 브랜치와 폴더의 책임, 중복 코드, 충돌 가능성 비교 | 원본 기능 브랜치를 보존하고 통합본을 별도 폴더로 구성할지 결정 |
+| 구현·리팩터링 | Manifest V3 통합, 자동 실행, 병렬 처리, 상태 복원, JSON 파서와 재시도 코드 작성 보조 | 실제 검색·기사 화면에서 자동 실행, 독립 토글, UI 배치와 하이라이트 확인 |
+| 병렬 코드 리뷰 | 제목·본문, 위험 JSON·페이지 경합, 공식 출처·Popover를 서로 다른 에이전트가 독립 검토 | 코드와 리뷰 지적을 대조하고 실제 구현과 맞는 수정만 반영 |
+| 반례 개선 | 수집 실패, 잘린 JSON, 약칭·정식 명칭 오판, SPA 페이지 이동, UI 뒤집힘·겹침 원인 분석 | 화면으로 재현한 뒤 사이트별 땜질이 아닌 일반화된 해결인지 판단 |
+| 제출·문서화 | 설치 절차, 권한, 데이터 보관, 예외 처리 설명과 Git 변경 범위 점검 | README만 보고 다른 환경에서 실행 가능한지와 민감정보 포함 여부 확인 |
+
+GitHub 게시 단계에서는 변경 범위 확인 → 명시적 파일 스테이징 → diff 검사 → 커밋 → 기본 브랜치 푸시 순서의 게시 스킬을 사용했습니다. 파일 검색과 호출 관계 확인에는 `rg`, 변경 검토에는 `git diff`, JavaScript와 Manifest 검증에는 로컬 구문·JSON 검사를 사용했습니다.
+
+### 런타임 AI와 코드 검증의 분리
+
+- Solar는 제목과 본문의 의미 일치, 위험 라벨, 공식성처럼 의미 추론이 필요한 후보를 구조화 JSON으로 생성합니다.
+- 브라우저 코드는 DOM 수집, 공개 URL 검사, 검색 페이지 식별, 허용 라벨·점수 범위, 원문 인용 존재 여부를 결정적으로 검증합니다.
+- 기사 본문은 신뢰할 수 없는 외부 데이터로 구분해 페이지 안의 문장을 명령으로 따르지 않도록 프롬프트 경계를 설정했습니다.
+- 모델 응답에 근거가 없거나 JSON을 복구할 수 없으면 억지로 정상·위험을 확정하지 않고 보류 또는 실패로 표시합니다.
+- 사람 개발자는 대표 검색 시나리오와 실패 사례를 직접 조작하면서 최종 요구사항과 배포 여부를 결정했습니다.
+
+### 포함한 AI 관련 파일
+
+- [`AGENTS.md`](AGENTS.md): 기능별 코드 책임, 병합 원칙, 보안, AI 협업과 검증 절차를 담은 저장소 공통 작업 지침입니다.
+- [`unified-extension/features/risk/lib/prompts.js`](unified-extension/features/risk/lib/prompts.js): 위험 판정의 허용 라벨, 근거 형식, 프롬프트 인젝션 경계를 코드로 관리합니다.
+- 제목·본문과 출처 표시 기능은 위 표의 `background.js`에 프롬프트와 응답 검증을 함께 두어 요청 생성과 검증 규칙을 한곳에서 확인할 수 있게 했습니다.
+
+이 프로젝트에서는 Claude·OMC 전용 설정을 사용하지 않았으므로 내용 없는 `.claude`나 `.omc` 파일을 형식적으로 만들지 않았습니다. 실제 사용한 지침과 코드만 기본 브랜치에 포함하며, API 키·대화 원문·개인정보는 포함하지 않습니다.
 
 ## 예외 처리와 안전장치
 
